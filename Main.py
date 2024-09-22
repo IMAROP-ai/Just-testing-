@@ -1,5 +1,6 @@
 import telebot
 import random
+import os
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 # Replace with your bot's API token
@@ -182,4 +183,4 @@ def check_math_answer(message, correct_answer):
         bot.reply_to(message, "Please enter a valid number.")
 
 # Run the bot
-bot.infinity_polling()
+bot.polling(none_stop=True, interval=0)
