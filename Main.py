@@ -2,8 +2,10 @@ import telebot
 import random
 import os
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
+from keep_alive import keep_alive  # Import the keep_alive function
 
-API_TOKEN = os.getenv('API_TOKEN')  # Replace hardcoded token with an environment variable
+
+API_TOKEN = os.getenv('7185464054:AAFaWfvQfpYxDZMagAmAQfalE83xu85suhg')  # Replace hardcoded token with an environment variable
 bot = telebot.TeleBot(API_TOKEN)
 
 current_games = {}
@@ -160,11 +162,16 @@ def check_math_answer(message, correct_answer):
     except ValueError:
         bot.reply_to(message, "Please enter a valid number.")
 
+# Keep the bot alive
+keep_alive()
+
 # Error handler to prevent crashes
 def handle_error(e):
     print(f"Error occurred: {e}")
 
+# Run the bot
 try:
     bot.polling(none_stop=True, interval=0)
 except Exception as e:
     handle_error(e)
+
