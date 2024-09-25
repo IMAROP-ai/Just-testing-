@@ -3,19 +3,15 @@ import random
 import os
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-# Replace with your bot's API token
-API_TOKEN = '7185464054:AAFaWfvQfpYxDZMagAmAQfalE83xu85suhg'
+API_TOKEN = os.getenv('API_TOKEN')  # Replace hardcoded token with an environment variable
 bot = telebot.TeleBot(API_TOKEN)
 
-# Dictionary to keep track of each user's current game
 current_games = {}
 
-# Start command
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
     bot.reply_to(message, "👋 Welcome! I can provide you with information about your Telegram account, /info Click here to know the information about your account. You can even play games with the bot, /games click here to play games")
 
-# Info command
 @bot.message_handler(commands=['info'])
 def send_info(message):
     user = message.from_user
@@ -31,16 +27,13 @@ def send_info(message):
     )
     bot.reply_to(message, info, parse_mode='Markdown')
 
-# Mini-games command
 @bot.message_handler(commands=['games'])
 def show_games(message):
-    # Create an inline keyboard with buttons for each mini-game
     markup = InlineKeyboardMarkup()
     games = [
         ("🎲 Guess the Number", "guess_number"),
         ("🧠 Hangman", "hangman"),
         ("🔢 Math Challenge", "math_challenge"),
-        # Add other games as needed
     ]
 
     for game_name, game_callback in games:
@@ -48,12 +41,10 @@ def show_games(message):
 
     bot.reply_to(message, "Choose a mini-game to play:", reply_markup=markup)
 
-# Callback handler for mini-games
 @bot.callback_query_handler(func=lambda call: True)
 def handle_game_selection(call):
     user_id = call.from_user.id
 
-    # Start the selected game and update the current game
     if call.data == "guess_number":
         current_games[user_id] = "guess_number"
         start_guess_game(call.message)
@@ -64,7 +55,6 @@ def handle_game_selection(call):
         current_games[user_id] = "math_challenge"
         start_math_challenge(call.message)
 
-# Example game: Guess the Number
 def start_guess_game(message):
     user_id = message.from_user.id
     number = random.randint(1, 10)
@@ -74,15 +64,13 @@ def start_guess_game(message):
 def check_guess(message, number):
     user_id = message.from_user.id
 
-    # Stop the game silently if the user started another one
     if current_games.get(user_id) != "guess_number":
         return
-    
+
     try:
         guess = int(message.text)
         markup = InlineKeyboardMarkup()
         markup.add(InlineKeyboardButton("Restart Guess the Number", callback_data="guess_number"))
-        
         if guess == number:
             bot.reply_to(message, "🎉 Correct! You guessed it!", reply_markup=markup)
         else:
@@ -90,12 +78,11 @@ def check_guess(message, number):
     except ValueError:
         bot.reply_to(message, "Please send a number between 1 and 10.")
 
-# Example game: Hangman
 def start_hangman(message):
     user_id = message.from_user.id
     word = random.choice(["python", "telegram", "bot", "hangman", "game"])
     hidden_word = ["_" for _ in word]
-    attempts = 6  # Number of incorrect guesses allowed
+    attempts = 6
 
     markup = InlineKeyboardMarkup()
     markup.add(InlineKeyboardButton("Restart Hangman", callback_data="hangman"))
@@ -106,7 +93,6 @@ def start_hangman(message):
 def play_hangman(message, word, hidden_word, attempts):
     user_id = message.from_user.id
 
-    # Stop the game silently if the user started another one
     if current_games.get(user_id) != "hangman":
         return
 
@@ -138,24 +124,19 @@ def play_hangman(message, word, hidden_word, attempts):
             msg = bot.reply_to(message, f"Incorrect! You have {attempts} attempts left.\n" + " ".join(hidden_word))
             bot.register_next_step_handler(msg, play_hangman, word, hidden_word, attempts)
 
-# Math Challenge Game
 def start_math_challenge(message):
     user_id = message.from_user.id
-
-    # Generate two random numbers and a random operator
     num1 = random.randint(1, 10)
     num2 = random.randint(1, 10)
     operator = random.choice(['+', '-', '*'])
-    
-    # Calculate the correct answer based on the operator
+
     if operator == '+':
         correct_answer = num1 + num2
     elif operator == '-':
         correct_answer = num1 - num2
     elif operator == '*':
         correct_answer = num1 * num2
-    
-    # Ask the math question
+
     markup = InlineKeyboardMarkup()
     markup.add(InlineKeyboardButton("Restart Math Challenge", callback_data="math_challenge"))
 
@@ -165,16 +146,13 @@ def start_math_challenge(message):
 def check_math_answer(message, correct_answer):
     user_id = message.from_user.id
 
-    # Stop the game silently if the user started another one
     if current_games.get(user_id) != "math_challenge":
         return
 
     try:
-        # Get the user's answer and compare it to the correct answer
         user_answer = int(message.text)
         markup = InlineKeyboardMarkup()
         markup.add(InlineKeyboardButton("Restart Math Challenge", callback_data="math_challenge"))
-        
         if user_answer == correct_answer:
             bot.reply_to(message, "🎉 Correct! Well done!", reply_markup=markup)
         else:
@@ -182,5 +160,11 @@ def check_math_answer(message, correct_answer):
     except ValueError:
         bot.reply_to(message, "Please enter a valid number.")
 
-# Run the bot
-bot.polling(none_stop=True, interval=0)
+# Error handler to prevent crashes
+def handle_error(e):
+    print(f"Error occurred: {e}")
+
+try:
+    bot.polling(none_stop=True, interval=0)
+except Exception as e:
+    handle_error(e)
