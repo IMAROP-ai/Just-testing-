@@ -1,11 +1,10 @@
 import telebot
 import random
-import os
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from keep_alive import keep_alive  # Import the keep_alive function
 
-
-API_TOKEN = os.getenv('7185464054:AAFaWfvQfpYxDZMagAmAQfalE83xu85suhg')  # Replace hardcoded token with an environment variable
+# Hardcoded API token
+API_TOKEN = '7185464054:AAFaWfvQfpYxDZMagAmAQfalE83xu85suhg'  # Your bot token
 bot = telebot.TeleBot(API_TOKEN)
 
 current_games = {}
@@ -174,4 +173,3 @@ try:
     bot.polling(none_stop=True, interval=0)
 except Exception as e:
     handle_error(e)
-
