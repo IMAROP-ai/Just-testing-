@@ -17,13 +17,13 @@ def send_welcome(message):
 @bot.message_handler(commands=['info'])
 def send_info(message):
     user = message.from_user
-    premium_status = "Yes 💎" if user.is_premium else "No 🚫"
+    
 
     info = (
         "🆔 *Here is your account information* ℹ️ 😙\n\n"
         f"👤 *Username*: @{user.username or 'N/A'}\n"
         f"📛 *Full Name*: {user.first_name} {user.last_name or ''}\n"
-        f"💼 *Telegram Premium*: {premium_status}\n"
+        
         f"🔑 *Telegram ID*: `{user.id}`\n\n"
         "For promotion or any issues - [@Imarop](https://t.me/imarop)"
     )
