@@ -13,6 +13,7 @@ current_games = {}
 def send_welcome(message):
     bot.reply_to(message, "👋 Welcome! I can provide you with information about your Telegram account, /info Click here to know the information about your account. You can even play games with the bot, /games click here to play games")
 
+# Info command
 @bot.message_handler(commands=['info'])
 def send_info(message):
     user = message.from_user
